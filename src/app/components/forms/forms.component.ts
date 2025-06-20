@@ -2,19 +2,21 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { GetUnitsService } from '../../services/get-units.service';
+import { UnitLocation } from '../../types/location.interface';
 
 @Component({
   selector: 'app-forms',
   standalone: true,
   imports: [
     ReactiveFormsModule,
-    CommonModule
+    CommonModule,
   ],
   templateUrl: './forms.component.html',
   styleUrl: './forms.component.scss'
 })
 export class FormsComponent implements OnInit {
-  results = [];
+  results: UnitLocation[] = [];
+  filteredResults: UnitLocation[] = [];
   formGroup!: FormGroup;
 
   constructor(private formBuilder: FormBuilder, private unitService: GetUnitsService) {
@@ -22,15 +24,23 @@ export class FormsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.unitService.getAllUnits().subscribe(data => console.log(data));
     this.formGroup = this.formBuilder.group({
       hour: '',
-      showClosed: false
+      showClosed: true
     })
+    
+    this.unitService.getAllUnits().subscribe(data => {
+      this.results = data.locations;
+      this.filteredResults = data.locations;
+    });
   }
 
   onSubmit(): void {
-    console.log(this.formGroup.value);
+    if (!this.formGroup.value.showClosed) {
+      this.filteredResults = this.results.filter(location => location.opened == true)
+    } else {
+      this.filteredResults = this.results;
+    }
   }
 
   onClean(): void {
