@@ -28,11 +28,11 @@ export class FormsComponent implements OnInit {
   }
 
   onSubmit(): void {
-    console.log("submit")
+    console.log(this.formGroup.value);
   }
 
   onClean(): void {
-    console.log("clean")
+    this.formGroup.reset();
   }
 
 }
